@@ -101,7 +101,7 @@ This dataset is useful for analyzing trends in the automotive industry, such as 
   ```
 - View Dashboard
   
-  [Car Sales Dashboard]()
+  [Car Sales Dashboard](http://192.168.0.60:8501)
   
 ---
 ### 🌐 API Endpoints (Will be updated)
