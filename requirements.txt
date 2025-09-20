@@ -3,3 +3,5 @@ pyngrok
 fastapi[standard]
 plotly
 statsmodels
+matplotlib
+seaborn
