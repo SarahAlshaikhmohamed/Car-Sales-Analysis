@@ -204,17 +204,16 @@ with descriptive_statistics:
             upper_bound = Q3 + 1.5 * IQR
             outliers = filtered_data[(filtered_data[selected_col] < lower_bound) | 
                                      (filtered_data[selected_col] > upper_bound)]
-            st.info(f"**IQR:** {IQR:.2f}\t**Lower Bound:** {lower_bound:.2f}\t**Upper Bound:** {upper_bound:.2f}\t**Number of Outliers:** {len(outliers)}")
-            iqr_col, low_col, up_col, numout_col = st.columns(4)
-            with iqr_col:
-                st.write(f"**IQR:** {IQR:.2f}")
-            with low_col:
-                st.write(f"**Lower Bound:** {lower_bound:.2f}")
-            with up_col:
-                st.write(f"**Upper Bound:** {upper_bound:.2f}")
-            with numout_col:
-                st.write(f"**Number of Outliers:** {len(outliers)}")
             
+            iqr_col, low_col, up_col = st.columns(3)
+            with iqr_col:
+                st.info(f"**IQR:** {IQR:.2f}")
+            with low_col:
+                st.info(f"**Lower Bound:** {lower_bound:.2f}")
+            with up_col:
+                st.info(f"**Upper Bound:** {upper_bound:.2f}")
+            st.success(f"**Number of Outliers:** {len(outliers)}")
+
             # Show outliers
             if len(outliers) > 0:
                 if st.checkbox("🔎View Detected Outliers"): 
@@ -235,7 +234,7 @@ with descriptive_statistics:
             # Identify outliers (z-score > 3)
             outliers = filtered_data[z_scores > 3]
             
-            st.info(f"**Number of Outliers:** {len(outliers)}")
+            st.success(f"**Number of Outliers:** {len(outliers)}")
             
             # Show outliers
             if len(outliers) > 0:
