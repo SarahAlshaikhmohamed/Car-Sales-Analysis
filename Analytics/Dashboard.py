@@ -8,6 +8,7 @@ from scipy.stats import zscore
 import io
 import base64
 import os
+import requests
 
 # Set page configuration
 st.set_page_config(page_title="Car Sales Dashboard", layout="wide")
@@ -570,15 +571,62 @@ with visualization:
     """)
 
 with prediction:
-    st.markdown('<p class="sub-header"> Prediction</p>', unsafe_allow_html=True)
-    st.markdown("""
-    <div style='background-color: #1f77b4; padding: 15px; border-radius: 10px; border-left: 5px solid #28a745; margin-bottom: 20px;'>
-    <h4 style='color: #f0f8ff; margin-top: 0;'>Machine Learning Price Prediction</h4>
-    <p>Use our trained machine learning model to predict car prices based on vehicle features. 
-        The model analyzes historical sales data to provide accurate price estimates.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    st.header("Car Price Prediction")
 
+    # Mapping manufacturer to models
+    manufacturer_models = {
+        "BMW": ["M5", "X3", "Z4"],
+        "Ford": ["Fiesta", "Focus", "Mondeo"],
+        "Porsche": ["911", "718 Cayman", "Cayenne"],
+        "Toyota": ["Prius", "RAV4", "Yaris"],
+        "VW": ["Golf", "Passat", "Polo"]
+    }
+
+    f1, f2, f3, = st.columns(3)
+    with f1:
+        engine_size = st.selectbox("Engine size", [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 3.0, 3.5, 4.0, 4.4, 5.0])
+
+    with f2:
+        year = st.slider("Year", min_value=1984, max_value=2025, value=2025)
+
+    with f3:
+        mileage = st.slider("Mileage", min_value=0, max_value=500000, value=100000, step=1000)
+
+    f4, f5, f6, = st.columns(3)
+    with f4:
+        manufacturer = st.selectbox("Manufacturer", list(manufacturer_models.keys()))
+
+    with f5:
+        model = st.selectbox("Model", manufacturer_models[manufacturer])
+
+    with f6:
+        fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "Hybrid"])
+
+    if st.button("Predict"):
+        url = "http://127.0.0.1:8000/predict"
+        payload = {
+            "engine_size": float(engine_size),
+            "year": int(year),
+            "mileage": int(mileage),
+            "manufacturer": manufacturer,
+            "model": model,
+            "fuel_type": fuel_type,
+        }
+        try:
+            # send JSON body (POST)
+            response = requests.post(url, json=payload, timeout=5)
+            response.raise_for_status()
+            result = response.json()
+            stat, ml, dl, = st.columns(3)
+            with stat:
+                st.success(f"Price (statsmodels): ${abs(result.get('stat_price')):,.2f}")
+            with ml:
+                st.success(f"Price (ML): ${result.get('ml_price'):,.2f}")
+            with dl:
+                st.success(f"Price (DL): ${result.get('dl_price'):,.2f}")
+        except Exception as e:
+            st.error(f"Error connecting to prediction API: {e}")
+            st.info("Make sure your FastAPI server is running on http://127.0.0.1:8000")
 
 
 # FastAPI endpoint configuration
