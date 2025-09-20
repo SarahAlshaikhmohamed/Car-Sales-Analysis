@@ -21,6 +21,7 @@ st.markdown("""
     .info-text {font-size: 1rem; color: #333;}
     .stButton>button {background-color: #1f77b4; color: white;}
     .dataset-description {background-color: #black; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;}
+    .features {border: solid 1px; border-radius:8px; border-color: #ff7f0e; text-align:center; font-size: 12px; color: #ff7f0e; padding: 5px; margin-bottom: 25px;}
     [data-testid="stSidebar"] {
             min-width: 350px;
             max-width: 350px;
@@ -131,19 +132,33 @@ with st.sidebar:
             """, unsafe_allow_html=True)    
     
 # main sections
-data_overview, descriptive_statistics, visualization, prediction = st.tabs(["Data Overview", "Descriptive Statistics", "Visualizations", "Prediction"])
+data_overview, descriptive_statistics, visualization, prediction = st.tabs(["Data Overview", "Descriptive Statistics", "Visualizations", "Price Prediction"])
 
 # data overview section
 with data_overview:
     row_num, col_num, cat_num, num_num = st.columns(4)
     with row_num:
-        st.metric("Rows Number", filtered_data.shape[0])
+        st.metric("Records Number", filtered_data.shape[0])
     with col_num:
-        st.metric("Columns Number", filtered_data.shape[1])
+        st.metric("Features Number", filtered_data.shape[1])
     with cat_num:
         st.metric("Categorical Data", (filtered_data.dtypes == 'object').sum())
     with num_num:
         st.metric("Numerical Data", sum(np.issubdtype(dt, np.number) for dt in filtered_data.dtypes))
+
+    st.write("Features")
+    cols = st.columns(len(filtered_data.columns))
+
+    for col, name in zip(cols, filtered_data.columns):
+        with col:
+            st.markdown(
+            f"""
+            <div class="features">
+                {name}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     insight_col1, insight_col2, insight_col3, insight_col4 = st.columns(4)
     with insight_col1:
