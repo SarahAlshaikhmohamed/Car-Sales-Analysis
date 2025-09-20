@@ -176,7 +176,7 @@ with insight_col3:
         st.metric("Year Range", "N/A")
 
 # Tabs for different sections
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Data Preview", "Descriptive Statistics", "Visualizations", "Outlier Analysis", "Data Quality", "Fuel & Mileage Analysis"])
+tab1, tab2, tab3, tab4, tab5, tab6 , tab7 = st.tabs(["Data Preview", "Descriptive Statistics", "Visualizations", "Outlier Analysis", "Data Quality", "Fuel & Mileage Analysis","Prediction"])
 
 with tab1:
     st.markdown('<p class="sub-header">Data Preview</p>', unsafe_allow_html=True)
@@ -617,6 +617,27 @@ with tab6:
                 """)
             
             st.markdown("</div>", unsafe_allow_html=True)
+
+        #for the Prediction tab 
+            with tab7:
+                st.markdown('<p class="sub-header"> Prediction</p>', unsafe_allow_html=True)
+                st.markdown("""
+    <div style='background-color: #1f77b4; padding: 15px; border-radius: 10px; border-left: 5px solid #28a745; margin-bottom: 20px;'>
+    <h4 style='color: #f0f8ff; margin-top: 0;'>Machine Learning Price Prediction</h4>
+    <p>Use our trained machine learning model to predict car prices based on vehicle features. 
+    The model analyzes historical sales data to provide accurate price estimates.</p>
+    </div>
+    """, unsafe_allow_html=True)
+                
+                # FastAPI endpoint configuration
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🔧 API Configuration")
+    api_url = st.sidebar.text_input(
+        "FastAPI Endpoint URL", 
+        value="http://localhost:8000/predict",
+        help="Enter the URL of your FastAPI prediction endpoint"
+    )
+
 
 
              
