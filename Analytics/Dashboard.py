@@ -20,154 +20,138 @@ st.markdown("""
     .metric-card {background-color: #f9f9f9; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);}
     .info-text {font-size: 1rem; color: #333;}
     .stButton>button {background-color: #1f77b4; color: white;}
-    .dataset-description {background-color: #f0f8ff; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;}
+    .dataset-description {background-color: #black; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;}
+    [data-testid="stSidebar"] {
+            min-width: 350px;
+            max-width: 350px;
+            font-size: 3px;
+        }
 </style>
 """, unsafe_allow_html=True)
 
 # Title and description
 st.markdown('<h1 class="main-header">🚗 Car Sales Dashboard</h1>', unsafe_allow_html=True)
 
-# Dataset Description
-with st.expander("📊 Dataset Description and Analysis Overview", expanded=True):
-    st.markdown("""
-    <div class="dataset-description">
-    <h3>About the Dataset</h3>
-    <p>This dashboard analyzes a comprehensive car sales dataset containing information about various vehicles 
-    including their specifications, pricing, and sales information. The dataset includes both numerical and 
-    categorical attributes that help in understanding the car market trends.</p>
-    
-    <h3>What We're Analyzing</h3>
-    <ul>
-        <li><strong>Pricing Trends:</strong> How car prices vary by manufacturer, model, year, and features</li>
-        <li><strong>Market Preferences:</strong> Popular car types, fuel types, and engine sizes</li>
-        <li><strong>Sales Performance:</strong> Which manufacturers and models are performing best in the market</li>
-        <li><strong>Feature Correlations:</strong> Relationships between different car attributes and their impact on price</li>
-        <li><strong>Outlier Detection:</strong> Identifying unusual patterns or anomalies in the data</li>
-    </ul>
-    
-    <h3>Key Metrics Tracked</h3>
-    <ul>
-        <li>Average car prices by manufacturer and fuel type</li>
-        <li>Distribution of cars by year of manufacture</li>
-        <li>Mileage patterns and their relationship to price</li>
-        <li>Engine size preferences across different car segments</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("Explore the car sales dataset with interactive charts and statistical insights")
-
 # Function to load data
 @st.cache_data
 def load_data():
     try:
         # Load your dataset .read_csv("../Dataset/winners_f1_cleaned.csv")
-        df = pd.read_csv("../Dataset/car_sales_data.csv")
+        df = pd.read_csv("../Dataset/processed_car_sales_data_cleaning.csv")
         
-        st.success(f"Dataset loaded successfully with {df.shape[0]} rows and {df.shape[1]} columns!")
         return df
     except:
         st.error("Dataset not found. Please place 'Dataset\car_sales_data.csv' in the same folder.")
         return pd.DataFrame()
-
-   
-
         
 # Load data
 data = load_data()
 
 # Sidebar for dataset describtion and filters and information
 with st.sidebar:
-    st.image("https://static.thenounproject.com/png/789273-200.png", width=100)
+    st.image("car.png", width=250)
     with st.sidebar:
-        st.header("About the Dataset")
-    st.markdown("""
-    **Car Sale Information**
-    
-    The car sales dataset includes detailed information about individual 
-    vehicle trade. It contain the columns like manufacturer, model, 
-    engine size, fuel type ,year of manfacture , mileage and price
-    """)
+        filters_tab, about_tab = st.tabs(["Filters", "About",])
 
+        with filters_tab:  
+            # Manufacturer filter
+            manufacturers = st.multiselect(
+            "Select Manufacturers",
+            options=data['Manufacturer'].unique(),
+            default=data['Manufacturer'].unique()
+            )
+    
+            # Fuel type filter
+            fuel_types = st.multiselect(
+            "Select Fuel Types",
+            options=data['Fuel type'].unique(),
+            default=data['Fuel type'].unique()
+            )
+    
+            # Mileage range filter
+            min_mileage, max_mileage = st.slider(
+            "Select Mileage Range",
+            min_value=int(data['Mileage'].min()),
+            max_value=int(data['Mileage'].max()),
+            value=(int(data['Mileage'].min()), int(data['Mileage'].max()))
+            )
+    
+            # Year range filter
+            min_year, max_year = st.slider(
+            "Select Year Range",
+            min_value=int(data['Year of manufacture'].min()),
+            max_value=int(data['Year of manufacture'].max()),
+            value=(int(data['Year of manufacture'].min()), int(data['Year of manufacture'].max()))
+            )
+    
+            # Price range filter
+            min_price, max_price = st.slider(
+            "Select Price Range ($)",
+            min_value=int(data['Price'].min()),
+            max_value=int(data['Price'].max()),
+            value=(int(data['Price'].min()), int(data['Price'].max()))
+            )
 
-    
-    st.title("Filters")
-    
-    # Manufacturer filter
-    manufacturers = st.multiselect(
-        "Select Manufacturers",
-        options=data['Manufacturer'].unique(),
-        default=data['Manufacturer'].unique()
-    )
-    
-    # Fuel type filter
-    fuel_types = st.multiselect(
-        "Select Fuel Types",
-        options=data['Fuel type'].unique(),
-        default=data['Fuel type'].unique()
-    )
-    
-    # Mileage range filter
-    min_mileage, max_mileage = st.slider(
-        "Select Mileage Range",
-        min_value=int(data['Mileage'].min()),
-        max_value=int(data['Mileage'].max()),
-        value=(int(data['Mileage'].min()), int(data['Mileage'].max()))
-    )
-    
-    # Year range filter
-    min_year, max_year = st.slider(
-        "Select Year Range",
-        min_value=int(data['Year of manufacture'].min()),
-        max_value=int(data['Year of manufacture'].max()),
-        value=(int(data['Year of manufacture'].min()), int(data['Year of manufacture'].max()))
-    )
-    
-    # Price range filter
-    min_price, max_price = st.slider(
-        "Select Price Range ($)",
-        min_value=int(data['Price'].min()),
-        max_value=int(data['Price'].max()),
-        value=(int(data['Price'].min()), int(data['Price'].max()))
-    )
-    
-    
+            # Filter data based on selections
+            filtered_data = data[
+                (data['Manufacturer'].isin(manufacturers)) &
+                (data['Fuel type'].isin(fuel_types)) &
+                (data['Mileage'] >= min_mileage) &
+                (data['Mileage'] <= max_mileage) &
+                (data['Year of manufacture'] >= min_year) &
+                (data['Year of manufacture'] <= max_year) &
+                (data['Price'] >= min_price) &
+                (data['Price'] <= max_price)
+            ]
 
-# Filter data based on selections
-filtered_data = data[
-    (data['Manufacturer'].isin(manufacturers)) &
-    (data['Fuel type'].isin(fuel_types)) &
-    (data['Mileage'] >= min_mileage) &
-    (data['Mileage'] <= max_mileage) &
-    (data['Year of manufacture'] >= min_year) &
-    (data['Year of manufacture'] <= max_year) &
-    (data['Price'] >= min_price) &
-    (data['Price'] <= max_price)
-]
+        with about_tab:
+            st.markdown("""
+                <div style="font-size:13px; line-height:1.6; text-align:justify;">
+        <h3>About the Dataset</h3>
+        <p>This dashboard analyzes a comprehensive car sales dataset containing information about various vehicles 
+        including their specifications, pricing, and sales information. The dataset includes both numerical and 
+        categorical attributes that help in understanding the car market trends.</p>
+
+        ### Analytics Objectives
+        - **Pricing Trends:** How prices vary by brand, model, year, and features.  
+        - **Market Preferences:** Popular car categories, fuel types, and engine sizes.  
+        - **Sales Performance:** Top-performing manufacturers and models.  
+        - **Feature Correlations:** Attribute relationships and their impact on price.  
+        - **Outlier Detection:** Spotting unusual patterns or anomalies.  
+
+        ### Key Metrics
+        - Average prices by manufacturer and fuel type.  
+        - Car distribution by year of manufacture.  
+        - Mileage trends and their effect on price.  
+        - Engine size preferences across segments.  
+                </div>
+            """, unsafe_allow_html=True)    
+    
 
 # Display dataset information
-st.markdown('<p class="sub-header">Dataset Information</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Data Overview</p>', unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric("Number of Rows", filtered_data.shape[0])
-with col2:
-    st.metric("Number of Columns", filtered_data.shape[1])
+row_num, col_num, cat_num, num_num = st.columns(4)
+with row_num:
+    st.metric("Rows Number", filtered_data.shape[0])
+with col_num:
+    st.metric("Columns Number", filtered_data.shape[1])
+with cat_num:
+    st.metric("Categorical Data", (data.dtypes == 'object').sum())
+with num_num:
+    st.metric("Numerical Data", sum(np.issubdtype(dt, np.number) for dt in data.dtypes))
 
-
-# Quick insights based on filters
-st.markdown("### 🔍 Quick Insights")
-insight_col1, insight_col2, insight_col3 = st.columns(3)
-
+insight_col1, insight_col2, insight_col3, insight_col4 = st.columns(4)
 with insight_col1:
-    avg_mileage = filtered_data['Mileage'].mean()
-    st.metric("Average Mileage", f"{avg_mileage:,.0f} miles")
-    
+    avg_mileage = filtered_data['Mileage'].mean() / 1000
+    st.metric("Average Mileage", f"{avg_mileage:,.2f}k mi")
 with insight_col2:
     most_common_fuel = filtered_data['Fuel type'].mode()[0] if len(filtered_data) > 0 else "N/A"
-    st.metric("Most Common Fuel Type", most_common_fuel)
-    
+    st.metric("Most Common Fuel", most_common_fuel)
 with insight_col3:
+    most_common_manufacturer = filtered_data['Manufacturer'].mode()[0] if len(filtered_data) > 0 else "N/A"
+    st.metric("Most Common Manufacturer", most_common_manufacturer)
+with insight_col4:
     if len(filtered_data) > 0:
         newest_car = filtered_data['Year of manufacture'].max()
         oldest_car = filtered_data['Year of manufacture'].min()
@@ -179,17 +163,8 @@ with insight_col3:
 tab1, tab2, tab3, tab4, tab5, tab6 , tab7 = st.tabs(["Data Preview", "Descriptive Statistics", "Visualizations", "Outlier Analysis", "Data Quality", "Fuel & Mileage Analysis","Prediction"])
 
 with tab1:
-    st.markdown('<p class="sub-header">Data Preview</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">View Data</p>', unsafe_allow_html=True)
     st.dataframe(filtered_data, use_container_width=True)
-    
-    # Download button
-    if len(filtered_data) > 0:
-        csv = filtered_data.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="filtered_car_sales_data.csv">Download CSV File</a>'
-        st.markdown(href, unsafe_allow_html=True)
-    else:
-        st.warning("No data to download after filtering")
 
 with tab2:
     st.markdown('<p class="sub-header">Descriptive Statistics</p>', unsafe_allow_html=True)
