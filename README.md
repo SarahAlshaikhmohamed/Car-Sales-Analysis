@@ -23,6 +23,8 @@ A Data analysis and machine learning project that explores car sales trends, bui
 - Plotly (dashboard plots).
 - FastAPI (backend model integration).
 - Scikit-learn (model training).
+- Statsmodels (model training).
+- Keras (model training).
 
 ---
 ### 📂 Project Structure
