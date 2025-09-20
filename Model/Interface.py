@@ -5,11 +5,36 @@ import joblib
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+import gdown
+import os
 
-# Load trained model
-stat_model = joblib.load("price_model_statsmodels.pkl")
-ml_model = joblib.load("price_model.pkl")
-dl_model = keras.models.load_model("price_prediction_model.keras")
+
+# Load trained model using googledive
+MODEL_DIR = "Models"
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# Direct download links
+stat_model_url = "https://drive.google.com/uc?id=1D2tHQZF-7zdofnOCdN0b5P4-mL9g_DN9"
+ml_model_url   = "https://drive.google.com/uc?id=1ugWkLWTWYCid9zupNV6JZvXbeR6i2G17"
+dl_model_url   = "https://drive.google.com/uc?id=1APHXvn-olqsqnmYQ2i0XFXP2UanR7FJg"
+
+# Local paths
+stat_model_path = os.path.join(MODEL_DIR, "price_model_statsmodels.pkl")
+ml_model_path   = os.path.join(MODEL_DIR, "price_model.pkl")
+dl_model_path   = os.path.join(MODEL_DIR, "price_prediction_model.keras")
+
+# Download (only if missing)
+if not os.path.exists(stat_model_path):
+    gdown.download(stat_model_url, stat_model_path, quiet=False)
+if not os.path.exists(ml_model_path):
+    gdown.download(ml_model_url, ml_model_path, quiet=False)
+if not os.path.exists(dl_model_path):
+    gdown.download(dl_model_url, dl_model_path, quiet=False)
+
+# Load models
+stat_model = joblib.load(stat_model_path)
+ml_model   = joblib.load(ml_model_path)
+dl_model   = keras.models.load_model(dl_model_path)
 
 app = FastAPI()
 
@@ -71,7 +96,7 @@ def predict(input_data: PredictionInput):
     # --- Keras ---
     dl_input = data[["Engine size", "Mileage"]].to_numpy()
     dl_model_pred = dl_model.predict(dl_input)[0][0]
-    
+
     return {
         "stat_price": float(stat_model_pred),
         "ml_price": float(ml_model_pred),

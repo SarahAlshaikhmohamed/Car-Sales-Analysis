@@ -9,3 +9,4 @@ uvicorn
 statsmodels
 scikit-learn==1.6.1
 tensorflow
+gdown
