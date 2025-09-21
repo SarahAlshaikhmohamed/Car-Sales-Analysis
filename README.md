@@ -43,10 +43,6 @@ Car-Sales-Analysis/
     └── car_sales_data.csv                            # Original Dataset
     └── processed_car_sales_data_cleaning.scv         # Procssed Dataset
 │── Model/                                            # Model Train & Interface
-    │── Models/
-       └── price_model.pkl                            # Trained ML Model
-       └── price_model_statsmodels.pkl                # Trained statmodels Model
-       └── price_prediction_model.keras               # Trained DL Model
     └── Machine_Learning_Train.ipynb                  # ML Model Train
     └── Statmodels_Train.ipynb                        # statmodels Model Train
     └── Deep_Learning_Train.ipynb                     # DL Model Train
