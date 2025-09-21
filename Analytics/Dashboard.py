@@ -200,6 +200,18 @@ with descriptive_statistics:
     else:
         st.warning("No data available for analysis after filtering")
 
+    st.markdown('<p class="sub-header">Correlation Heatmap</p>', unsafe_allow_html=True)
+    corr = numerical.corr()
+    fig = px.imshow(
+        corr,
+        text_auto=True,        # show correlation values on heatmap
+        aspect="auto",         # keeps cells square
+        color_continuous_scale="RdBu_r", # red-blue reversed, like coolwarm
+    )
+
+    # Display in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+
     # Outlier Analysis
     st.markdown('<p class="sub-header">Outlier Analysis</p>', unsafe_allow_html=True)
     
