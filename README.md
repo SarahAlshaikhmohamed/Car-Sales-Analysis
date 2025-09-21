@@ -53,8 +53,8 @@ Car-Sales-Analysis/
     └── Interface.py                                  # Fast API App
     └── Model.pkl                                     # Trained Model
     └── model_metadata                                # Models Metadata
-│── requirements.txt          # Dependencies
-│── README.md                 # Project documentation
+│── requirements.txt                                  # Dependencies
+│── README.md                                         # Project documentation
 ```
 
 ---
