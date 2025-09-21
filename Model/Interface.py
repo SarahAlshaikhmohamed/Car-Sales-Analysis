@@ -13,23 +13,26 @@ import os
 MODEL_DIR = "Models"
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# Direct download links
+def safe_download(url, output, min_size=50_000):
+    if not os.path.exists(output) or os.path.getsize(output) < min_size:
+        print(f"Downloading {output}...")
+        gdown.download(url, output, quiet=False, fuzzy=True)
+
+    # Double-check file size
+    size = os.path.getsize(output)
+    if size < min_size:
+        raise ValueError(f"Download of {output} seems incomplete (size={size} bytes).")
+    return output
+
+# Direct Google Drive links
 stat_model_url = "https://drive.google.com/uc?id=1D2tHQZF-7zdofnOCdN0b5P4-mL9g_DN9"
 ml_model_url   = "https://drive.google.com/uc?id=1ugWkLWTWYCid9zupNV6JZvXbeR6i2G17"
 dl_model_url   = "https://drive.google.com/uc?id=1APHXvn-olqsqnmYQ2i0XFXP2UanR7FJg"
 
-# Local paths
-stat_model_path = os.path.join(MODEL_DIR, "price_model_statsmodels.pkl")
-ml_model_path   = os.path.join(MODEL_DIR, "price_model.pkl")
-dl_model_path   = os.path.join(MODEL_DIR, "price_prediction_model.keras")
-
-# Download (only if missing)
-if not os.path.exists(stat_model_path):
-    gdown.download(stat_model_url, stat_model_path, quiet=False)
-if not os.path.exists(ml_model_path):
-    gdown.download(ml_model_url, ml_model_path, quiet=False)
-if not os.path.exists(dl_model_path):
-    gdown.download(dl_model_url, dl_model_path, quiet=False)
+# Paths for saving
+stat_model_path = safe_download(stat_model_url, "Model/price_model_statsmodels.pkl", min_size=50_000)
+ml_model_path   = safe_download(ml_model_url, "Model/price_model.pkl", min_size=50_000)
+dl_model_path   = safe_download(dl_model_url, "Model/price_prediction_model.keras", min_size=50_000)
 
 # Load models
 stat_model = joblib.load(stat_model_path)
