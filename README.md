@@ -140,7 +140,9 @@ The FastAPI backend exposes several endpoints:
 ---
 ### 🚀 Recommendations & Future Work (Will be updated)
  -Dealers should focus on competitive pricing in popular ranges.
+ 
  -Buyers should consider mileage as a major factor for value.
+ 
 - Fine tuning for the ML and state model.
 - Deploy API & dashboard on cloud (Heroku / Render / AWS).
 - Expand dataset with more real-world data.
