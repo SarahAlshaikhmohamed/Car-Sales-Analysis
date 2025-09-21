@@ -1,30 +1,35 @@
 # 🚗 Car Sales Analysis & Prediction
 
-A Data analysis and machine learning project that explores car sales trends, builds predictive models, and provides interactive dashboards for key insights. This project was built as part of the Data Science and Machine Learning Bootcamp at Tuwaiq Academy  - Week Two Project.
+This is a data science and machine learning project that analyzes car sales trends, builds predictive models, and provides an interactive dashboard with real-time price predictions. Developed during the Tuwaiq Academy Data Science & ML Bootcamp (Week 2 Project).
 
 ---
 ### 🎯 Objectives
-- Analyze car sales trends and identify key factors influencing sales.
-- Build a regression model to predict price and year.
-- Develop an interactive dashboard for visualization.
-- Provide actionable recommendations based on findings.
+- Analyze car sales data to uncover trends and patterns.
+- Identify key factors influencing car prices.
+- Build and compare multiple regression models (Statsmodels, Scikit-learn, Keras).
+- Deploy a FastAPI backend with endpoints for real-time car price prediction.
+- Create an interactive dashboard (Streamlit + Plotly) for data visualization and user input.
 
 ---
 ### ✨ Features
-- 📊 Exploratory Data Analysis (EDA): Trends, correlations, and statistical summaries.
-- 🤖 Regression Modeling: Predict price and year using features like price, fuel type, engine size, etc.
-- 📈 Interactive Dashboard: Built with Streamlit + Plotly.
-- ⚡ Fast API: Used for backend integration with regression model.
+- 📊 Exploratory Data Analysis (EDA): Distribution analysis, correlations, and statistical summaries.
+- 🤖 Predictive Modeling:
+      - Statsmodels regression.
+      - Scikit-learn regression model.
+      - Deep Learning (Keras Sequential model).
+- ⚡ FastAPI Backend: REST API for car price predictions (/predict).
+- 📈 Interactive Dashboard: Built with Streamlit + Plotly for user-friendly visualizations.
+- ☁️ Model Hosting: Large model files stored in Google Drive, automatically downloaded at runtime.
 
 ---
 ### 🛠 Tech Stack
-- Python (NumPy, Pandas, Matplotlib).
-- Streamlit (dashboard visualization).
-- Plotly (dashboard plots).
-- FastAPI (backend model integration).
-- Scikit-learn (model training).
-- Statsmodels (model training).
-- Keras (model training).
+- Python: NumPy, Pandas, Matplotlib, Seaborn.
+- Visualization: Streamlit, Plotly.
+- Machine Learning: Scikit-learn, Statsmodels.
+- Deep Learning: TensorFlow / Keras.
+- Backend: FastAPI (for API endpoints).
+- Model Hosting: Google Drive + gdown for large model files.
+- Version Control: Git + GitHub.
 
 ---
 ### 📂 Project Structure
@@ -93,47 +98,25 @@ This dataset is useful for analyzing trends in the automotive industry, such as 
   ```bash
   python eda/eda_script.py
   ```
-- Run FastAPI Server
-  ```bash
-  python -m uvicorn Interface:app --reload
-  ```
 - Run Streamlit dashboard
   ```bash
   python -m streamlit run Dashboard.py
+  ```
+- Run FastAPI Server
+  ```bash
+  python -m uvicorn Interface:app --reload
   ```
 - View Dashboard
   
   [Car Sales Dashboard](http://192.168.0.60:8501)
   
 ---
-### 🌐 API Endpoints (Will be updated)
+### 🌐 API Endpoints
 The FastAPI backend exposes several endpoints:
-| Method | Endpoint | Description | 
-|--------|---------------|--------------------------------------| 
-| GET | `/` | Welcome message / API health check | 
-| POST | `/predict` | Predicts car sales given input data | 
-| GET | `/sales-trends` | Returns processed sales trends data | 
-| GET | `/cars` | Fetches list of available cars |
-
-Example: 
-- Prediction Request
-  ```bash
-  POST /predict
-  Content-Type: application/json
-
-  {
-    "year": 2018,
-    "price": 20000,
-    "fuel_type": "Petrol",
-    "engine_size": 1800
-  }
-  ```
-- Prediction Response
-  ```bash
-  {
-  "predicted_sales": 345
-  }
-  ```
+| Method | Endpoint | Description | Request Body (JSON) | Response (JSON) |
+|--------|----------|-------------|----------------------|-----------------|
+| GET | `/` | Verify that the API is running | None | { "message": "Price Prediction API is running!" }
+| POST | `/predict` | Predict car price using Statsmodels, Scikit-learn, and Keras models | json { "engine_size": 2.0, "year": 2018, "mileage": 50000, "manufacturer": "Ford", "model": "Focus", "fuel_type": "Petrol" } | json { "stat_price": 15234.56, "ml_price": 14987.33, "dl_price": 15100.12 }
 
 ---
 ### 📈 Results & Insights (Will be updated)
