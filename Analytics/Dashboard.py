@@ -182,12 +182,12 @@ with data_overview:
     if st.checkbox("📊 View Data"):
         st.write(data)
 
-# descriptive statistics section
+
+# Descriptive statistics section
 with descriptive_statistics:
     st.markdown('<p class="sub-header">Data Description</p>', unsafe_allow_html=True)
     
     if len(filtered_data) > 0:
-        # Numerical columns
         numerical_cols = filtered_data.select_dtypes(include=np.number).columns
         numerical = filtered_data[numerical_cols]
         
@@ -195,380 +195,240 @@ with descriptive_statistics:
         stats_df = numerical.describe().T
         stats_df['range'] = stats_df['max'] - stats_df['min']
         st.dataframe(stats_df)
-        
     else:
         st.warning("No data available for analysis after filtering")
-        
+
+    # Outlier Analysis
     st.markdown('<p class="sub-header">Outlier Analysis</p>', unsafe_allow_html=True)
     
     if len(filtered_data) > 0:
         method_col, column_col = st.columns(2)
         with method_col:
-            # Select method for outlier detection
             outlier_method = st.selectbox("**Outlier Detection Method**", ["IQR Method", "Z-Score Method"])
         with column_col:
             selected_col = st.selectbox("**Feature of Outlier Analysis**", numerical_cols)
         
+        st.markdown("### Outliers Graph")  # Heading before the graph
+
         if outlier_method == "IQR Method":
-            # Calculate IQR
             Q1 = filtered_data[selected_col].quantile(0.25)
             Q3 = filtered_data[selected_col].quantile(0.75)
             IQR = Q3 - Q1
             
-            # Identify outliers
             lower_bound = Q1 - 1.5 * IQR
             upper_bound = Q3 + 1.5 * IQR
             outliers = filtered_data[(filtered_data[selected_col] < lower_bound) | 
                                      (filtered_data[selected_col] > upper_bound)]
             
             iqr_col, low_col, up_col = st.columns(3)
-            with iqr_col:
-                st.info(f"**IQR:** {IQR:.2f}")
-            with low_col:
-                st.info(f"**Lower Bound:** {lower_bound:.2f}")
-            with up_col:
-                st.info(f"**Upper Bound:** {upper_bound:.2f}")
+            iqr_col.info(f"**IQR:** {IQR:.2f}")
+            low_col.info(f"**Lower Bound:** {lower_bound:.2f}")
+            up_col.info(f"**Upper Bound:** {upper_bound:.2f}")
             st.success(f"**Number of Outliers:** {len(outliers)}")
-
-            # Show outliers
-            if len(outliers) > 0:
-                if st.checkbox("🔎View Detected Outliers"): 
-                    st.write("")
-                    st.dataframe(outliers[['Manufacturer', 'Model', 'Year of manufacture', selected_col]])
             
-            # Boxplot
-            fig, ax = plt.subplots(figsize=(10, 6))
-            sns.boxplot(x=filtered_data[selected_col], ax=ax)
-            ax.set_title(f"Boxplot of {selected_col} with Outliers")
-            st.pyplot(fig)
-        
+            if len(outliers) > 0:
+                if st.checkbox("🔎 View Detected Outliers"): 
+                    st.dataframe(outliers[['Manufacturer', 'Model', 'Year of manufacture', selected_col]])
+
+            # Plotly Boxplot
+            fig = px.box(
+                filtered_data, 
+                y=selected_col,
+                points="all",  # shows all points
+                title=f"Boxplot of {selected_col} with Outliers"
+            )
+            fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Insights & Recommendations
+            st.markdown("### 📊 Insights & Recommendations")
+            st.write(f"- {len(outliers)} outliers detected in {selected_col}.")
+            if len(outliers) > 0:
+                st.info("- Outliers may distort statistical analyses; consider removing or transforming them for modeling.")
+            else:
+                st.success("- No significant outliers detected; data is relatively clean.")
+
         else:  # Z-Score Method
-            # Calculate z-scores
             z_scores = np.abs((filtered_data[selected_col] - filtered_data[selected_col].mean()) / 
                                filtered_data[selected_col].std())
-            
-            # Identify outliers (z-score > 3)
             outliers = filtered_data[z_scores > 3]
             
             st.success(f"**Number of Outliers:** {len(outliers)}")
             
-            # Show outliers
             if len(outliers) > 0:
-                if st.checkbox("🔎View Detected Outliers"): 
-                    st.write("")
+                if st.checkbox("🔎 View Detected Outliers"): 
                     st.dataframe(outliers[['Manufacturer', 'Model', 'Year of manufacture', selected_col]])
-            
-            # Distribution plot with outliers highlighted
-            fig, ax = plt.subplots(figsize=(10, 6))
-            sns.histplot(filtered_data[selected_col], kde=True, ax=ax, label='Normal')
+
+            # Plotly Histogram with outliers highlighted
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=filtered_data[selected_col],
+                name='Normal',
+                nbinsx=30,
+                marker_color='#636EFA'
+            ))
             if len(outliers) > 0:
-                sns.histplot(outliers[selected_col], kde=True, ax=ax, color='red', label='Outliers')
-            ax.set_title(f"Distribution of {selected_col} with Outliers Highlighted")
-            ax.legend()
-            st.pyplot(fig)
+                fig.add_trace(go.Histogram(
+                    x=outliers[selected_col],
+                    name='Outliers',
+                    nbinsx=30,
+                    marker_color='red'
+                ))
+            fig.update_layout(
+                barmode='overlay',
+                title=f"Distribution of {selected_col} with Outliers Highlighted",
+                margin=dict(l=40, r=40, t=50, b=40)
+            )
+            fig.update_traces(opacity=0.75)
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Insights & Recommendations
+            st.markdown("### 📊 Insights & Recommendations")
+            st.write(f"- {len(outliers)} outliers detected using Z-Score method in {selected_col}.")
+            if len(outliers) > 0:
+                st.info("- Outliers could affect mean-based statistics; consider trimming or transforming values.")
+            else:
+                st.success("- No extreme outliers found; distribution is acceptable.")
     else:
         st.warning("No data available for outlier analysis after filtering")
-                
-with visualization:
+
+
+    with visualization:
     st.markdown('<p class="sub-header">Data Visualizations</p>', unsafe_allow_html=True)
-    
+
     if len(filtered_data) > 0:
-        # Select visualization type
         viz_type = st.selectbox(
             "Select Visualization Type",
             ["Histograms", "Scatter Plots", "Categorical Analysis", "Price Distribution", "Mileage Analysis"]
         )
-        
+
+        # ------------------- Histograms -------------------
         if viz_type == "Histograms":
-            col1, col2 = st.columns(2)
-            with col1:
-                selected_col = st.selectbox("Select Column", numerical_cols)
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sns.histplot(filtered_data[selected_col], kde=True, ax=ax)
-                ax.set_title(f"Distribution of {selected_col}")
-                st.pyplot(fig)
-            
-                # Histogram insights
-                st.markdown("### 📊 Histogram Insights")
+            selected_col = st.selectbox("Select Column", numerical_cols)
+
+            # Row with histogram and boxplot
+            row1_col1, row1_col2 = st.columns([1,1], gap="large")
+
+            with row1_col1:
+                fig = px.histogram(
+                    filtered_data, 
+                    x=selected_col, 
+                    nbins=30, 
+                    marginal="box",
+                    title=f"Distribution of {selected_col}",
+                    color_discrete_sequence=['#636EFA']
+                )
+                fig.update_layout(bargap=0.1, margin=dict(l=40, r=40, t=50, b=40))
+                st.plotly_chart(fig, use_container_width=True)
+
+                # Insights & Recommendations
                 mean_val = filtered_data[selected_col].mean()
                 median_val = filtered_data[selected_col].median()
                 std_val = filtered_data[selected_col].std()
                 skew_val = filtered_data[selected_col].skew()
-                
-                st.metric("Mean", f"{mean_val:.2f}")
-                st.metric("Median", f"{median_val:.2f}")
-                st.metric("Standard Deviation", f"{std_val:.2f}")
-                
+                st.markdown("### 📊 Insights & Recommendations")
+                st.write(f"- Mean: {mean_val:.2f}, Median: {median_val:.2f}, Std Dev: {std_val:.2f}")
                 if abs(skew_val) > 0.5:
                     skew_direction = "right-skewed" if skew_val > 0 else "left-skewed"
-                    st.info(f"**Distribution Shape:** {skew_direction} (skewness: {skew_val:.2f})")
+                    st.info(f"- Distribution is {skew_direction} (skewness: {skew_val:.2f}) → consider transformations for modeling")
                 else:
-                    st.success("**Distribution Shape:** Approximately symmetric")
-            
-            with col2:
-                fig, ax = plt.subplots(figsize=(10, 6))
-                numerical.boxplot(ax=ax)
-                ax.set_title("Boxplot of Numerical Features")
-                plt.xticks(rotation=45)
-                st.pyplot(fig)
-                
-                # Boxplot insights
-                st.markdown("### 📊 Boxplot Insights")
-                st.write("**Spread Comparison:**")
+                    st.success("- Distribution approximately symmetric → suitable for most analyses")
+
+            with row1_col2:
+                fig = go.Figure()
+                for col in numerical_cols:
+                    fig.add_trace(go.Box(y=filtered_data[col], name=col))
+                fig.update_layout(title="Boxplot of Numerical Features", margin=dict(l=40, r=40, t=50, b=40))
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.markdown("### 📊 Insights & Recommendations")
                 for col in numerical_cols:
                     iqr = filtered_data[col].quantile(0.75) - filtered_data[col].quantile(0.25)
                     st.write(f"- {col}: IQR = {iqr:.2f}")
-                
-                # Identify most variable feature
                 most_variable = numerical_cols[np.argmax([filtered_data[col].std() for col in numerical_cols])]
-                st.success(f"**Most Variable Feature:** {most_variable}")
-        
+                st.info(f"- Most variable feature: {most_variable} → consider normalizing for modeling")
+
+        # ------------------- Scatter Plots -------------------
         elif viz_type == "Scatter Plots":
-            col1, col2 = st.columns(2)
-            with col1:
+            row1_col1, row1_col2 = st.columns([1,1], gap="large")
+            with row1_col1:
                 x_axis = st.selectbox("X-Axis", numerical_cols, index=0)
-            with col2:
+            with row1_col2:
                 y_axis = st.selectbox("Y-Axis", numerical_cols, index=len(numerical_cols)-1)
-            
-            fig, ax = plt.subplots(figsize=(10, 6))
-            sns.scatterplot(data=filtered_data, x=x_axis, y=y_axis, hue='Fuel type', ax=ax)
-            ax.set_title(f"{y_axis} vs {x_axis} by Fuel Type")
-            st.pyplot(fig)
-            
-            # Scatter plot insights
-            st.markdown("### 📊 Scatter Plot Insights")
-            
-            # Calculate correlation
+
+            fig = px.scatter(
+                filtered_data,
+                x=x_axis,
+                y=y_axis,
+                color='Fuel type',
+                trendline="ols",
+                title=f"{y_axis} vs {x_axis} by Fuel Type"
+            )
+            fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown("### 📊 Insights & Recommendations")
             correlation = filtered_data[x_axis].corr(filtered_data[y_axis])
             correlation_strength = "strong" if abs(correlation) > 0.7 else "moderate" if abs(correlation) > 0.3 else "weak"
             direction = "positive" if correlation > 0 else "negative"
-            
-            st.metric("Correlation Coefficient", f"{correlation:.3f}")
-            st.info(f"**Relationship:** {correlation_strength} {direction} correlation")
-            
-            # Regression line insight
+            st.write(f"- Correlation coefficient: {correlation:.3f} ({correlation_strength} {direction})")
             if abs(correlation) > 0.3:
-                st.success(f"As {x_axis} increases, {y_axis} tends to {'increase' if correlation > 0 else 'decrease'}")
+                st.success(f"- As {x_axis} increases, {y_axis} tends to {'increase' if correlation > 0 else 'decrease'} → useful predictor for modeling")
             else:
-                st.warning("No strong linear relationship detected between these variables")
-        
+                st.warning("- Weak linear relationship → consider nonlinear models or feature engineering")
+
+        # ------------------- Categorical Analysis -------------------
         elif viz_type == "Categorical Analysis":
             categorical_cols = filtered_data.select_dtypes(include='object').columns
             categorical_col = st.selectbox("Select Categorical Column", categorical_cols)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                # Count plot
-                fig, ax = plt.subplots(figsize=(10, 6))
+
+            row1_col1, row1_col2 = st.columns([1,1], gap="large")
+
+            with row1_col1:
                 counts = filtered_data[categorical_col].value_counts()
-                sns.countplot(data=filtered_data, y=categorical_col, ax=ax, order=counts.index)
-                ax.set_title(f"Count of Cars by {categorical_col}")
-                st.pyplot(fig)
-                
-                # Count plot insights
-                st.markdown("### 📊 Count Insights")
+                fig = px.bar(
+                    x=counts.values, 
+                    y=counts.index, 
+                    orientation='h',
+                    title=f"Count of Cars by {categorical_col}",
+                    text=counts.values,
+                    color_discrete_sequence=['#636EFA']
+                )
+                fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.markdown("### 📊 Insights & Recommendations")
                 dominant_category = counts.index[0]
                 dominant_percentage = (counts.iloc[0] / counts.sum()) * 100
-                
-                st.metric("Most Common", dominant_category)
-                st.metric("Market Share", f"{dominant_percentage:.1f}%")
-                st.metric("Unique Values", len(counts))
-                
+                st.write(f"- Most common category: {dominant_category} ({dominant_percentage:.1f}%)")
                 if dominant_percentage > 50:
-                    st.success(f"**Market Dominance:** {dominant_category} dominates this category")
-            
-            with col2:
-                # Average price by category
-                fig, ax = plt.subplots(figsize=(10, 6))
+                    st.success(f"- {dominant_category} dominates the category → consider balanced sampling if modeling")
+
+            with row1_col2:
                 avg_price = filtered_data.groupby(categorical_col)['Price'].mean().sort_values(ascending=False)
-                sns.barplot(x=avg_price.values, y=avg_price.index, ax=ax)
-                ax.set_title(f"Average Price by {categorical_col}")
-                ax.set_xlabel("Average Price")
-                st.pyplot(fig)
-                
-                # Price insights
-                st.markdown("### 📊 Price Insights")
+                fig = px.bar(
+                    x=avg_price.values, 
+                    y=avg_price.index, 
+                    orientation='h',
+                    title=f"Average Price by {categorical_col}",
+                    text=[f"${v:,.0f}" for v in avg_price.values],
+                    color_discrete_sequence=['#EF553B']
+                )
+                fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.markdown("### 📊 Insights & Recommendations")
                 highest_price_cat = avg_price.index[0]
-                highest_price = avg_price.iloc[0]
                 lowest_price_cat = avg_price.index[-1]
-                lowest_price = avg_price.iloc[-1]
-                
-                st.metric("Highest Average Price", f"{highest_price_cat} (${highest_price:,.0f})")
-                st.metric("Lowest Average Price", f"{lowest_price_cat} (${lowest_price:,.0f})")
-                
-                price_ratio = highest_price / lowest_price
-                st.info(f"**Price Range:** {price_ratio:.1f}x difference between highest and lowest")
-        
-        elif viz_type == "Price Distribution":
-            # Price distribution by manufacturer
-            fig, ax = plt.subplots(figsize=(12, 8))
-            sns.boxplot(data=filtered_data, x='Manufacturer', y='Price', ax=ax)
-            ax.set_title("Price Distribution by Manufacturer")
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
-            
-            # Price distribution insights
-            st.markdown("### 📊 Price Distribution Insights")
-            
-            # Calculate price statistics by manufacturer
-            price_stats = filtered_data.groupby('Manufacturer')['Price'].agg(['mean', 'median', 'std']).round(2)
-            price_stats = price_stats.sort_values('mean', ascending=False)
-            
-            st.write("**Price Statistics by Manufacturer:**")
-            st.dataframe(price_stats.style.format({'mean': '${:,.2f}', 'median': '${:,.2f}', 'std': '${:,.2f}'}))
-            
-            # Identify manufacturers with highest and lowest prices
-            most_expensive = price_stats.index[0]
-            least_expensive = price_stats.index[-1]
-            price_difference = price_stats['mean'].iloc[0] - price_stats['mean'].iloc[-1]
-        
-            st.success(f"**Price Range:** {most_expensive} is ${price_difference:,.0f} more expensive than {least_expensive} on average")
-            
-        elif viz_type == "Mileage Analysis":
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # Mileage distribution by fuel type
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sns.boxplot(data=filtered_data, x='Fuel type', y='Mileage', ax=ax)
-                ax.set_title("Mileage Distribution by Fuel Type")
-                plt.xticks(rotation=45)
-                st.pyplot(fig)
-                
-                # Mileage by fuel type insights
-                st.markdown("### 📊 Mileage by Fuel Type")
-                mileage_stats = filtered_data.groupby('Fuel type')['Mileage'].agg(['mean', 'median']).round(0)
-                mileage_stats = mileage_stats.sort_values('mean', ascending=False)
-                
-                for fuel_type, stats in mileage_stats.iterrows():
-                    st.metric(f"{fuel_type} Avg Mileage", f"{stats['mean']:,.0f} mi")
-                
-                highest_mileage_fuel = mileage_stats.index[0]
-                st.info(f"**Highest Mileage:** {highest_mileage_fuel} vehicles have the highest average mileage")
-            
-            with col2:
-                # Mileage vs Price scatter plot
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sns.scatterplot(data=filtered_data, x='Mileage', y='Price', hue='Fuel type', ax=ax)
-                ax.set_title("Price vs Mileage by Fuel Type")
-                st.pyplot(fig)
-                
-                # Mileage vs Price insights
-                st.markdown("### 📊 Price-Mileage Relationship")
-                
-                correlation = filtered_data['Mileage'].corr(filtered_data['Price'])
-                st.metric("Correlation", f"{correlation:.3f}")
-                
-                if correlation < -0.3:
-                    st.success("**Strong Negative Relationship:** Higher mileage generally correlates with lower prices")
-                elif correlation > 0.3:
-                    st.warning("**Unexpected Positive Relationship:** Higher mileage correlates with higher prices")
-                else:
-                    st.info("**Weak Relationship:** Mileage has little correlation with price in this dataset")
-                
-                # Average price per mileage quartile
-                filtered_data['Mileage_Quartile'] = pd.qcut(filtered_data['Mileage'], 4, labels=['Low', 'Medium-Low', 'Medium-High', 'High'])
-                quartile_prices = filtered_data.groupby('Mileage_Quartile')['Price'].mean()
-                
-                st.write("**Average Price by Mileage Quartile:**")
-                for quartile, price in quartile_prices.items():
-                    st.write(f"- {quartile} Mileage: ${price:,.0f}")
+                price_ratio = avg_price.iloc[0] / avg_price.iloc[-1]
+                st.write(f"- Price range: {highest_price_cat} vs {lowest_price_cat} → {price_ratio:.1f}x difference")
+                if price_ratio > 3:
+                    st.info("- High price disparity → consider price normalization or log transformation for analysis")
+
+       
+
     else:
         st.warning("No data available for visualization after filtering")
-
-    st.markdown('<p class="sub-header">Fuel Type and Mileage Analysis</p>', unsafe_allow_html=True)
-    if len(filtered_data) > 0:
-        # Create two columns - one for the chart, one for insights
-        chart_col, insight_col = st.columns([2, 1])
-
-        with chart_col:
-            st.write("### Car Distribution by Fuel Type")
-            
-            # Calculate value counts for fuel type (using your EDA method)
-            counts = filtered_data['Fuel type'].value_counts(normalize=True) * 100  # percentages
-
-            # Separate values < 5% into "Others" (following your EDA approach)
-            small = counts[counts < 5].sum()   # sum of all small categories
-            counts = counts[counts >= 5]       # keep big categories
-            if small > 0:
-                counts["Others"] = small       # add Others category
-
-            # Create pie chart
-            fig, ax = plt.subplots(figsize=(8, 8))
-            wedges, texts, autotexts = ax.pie(
-                counts.values, 
-                labels=counts.index, 
-                autopct='%1.1f%%', 
-                startangle=140,
-                colors=sns.color_palette('pastel'),
-                explode=[0.05] * len(counts)  # Slightly separate slices
-            )
-            
-            # Style the percentages
-            for autotext in autotexts:
-                autotext.set_color('white')
-                autotext.set_fontweight('bold')
-            
-            ax.axis('equal')  # Ensure pie is drawn as a circle
-            ax.set_title("Fuel Type Distribution")
-            st.pyplot(fig)
-
-        with insight_col:
-            st.write("### 📊 Insights")
-            st.markdown("""
-            <div style='background-color: #f0f8ff; padding: 15px; border-radius: 10px; border-left: 5px solid #1f77b4;'>
-            <h4 style='color: #1f77b4; margin-top: 0;'>Fuel Type Distribution Analysis</h4>
-            """, unsafe_allow_html=True)
-            
-            # Calculate insights
-            total_cars = len(filtered_data)
-            dominant_fuel = counts.index[0]
-            dominant_percentage = counts.values[0]
-            
-            # Display insights
-            st.metric("Total Cars Analyzed", total_cars)
-            st.metric("Most Common Fuel Type", f"{dominant_fuel} ({dominant_percentage:.1f}%)")
-        
-            # Add textual insights based on your EDA findings
-            if len(counts) == 3:
-                second_fuel = counts.index[1]
-                second_percentage = counts.values[1]
-                third_fuel = counts.index[2]
-                third_percentage = counts.values[2]
-                
-                st.metric("Second Most Common", f"{second_fuel} ({second_percentage:.1f}%)")
-                st.metric("Third Most Common", f"{third_fuel} ({third_percentage:.1f}%)")
-                
-                st.info(f"""
-                **Key Observations:**
-                - {dominant_fuel} vehicles dominate the market with {dominant_percentage:.1f}% share
-                - {second_fuel} represents {second_percentage:.1f}% of the market
-                - {third_fuel} accounts for {third_percentage:.1f}% of vehicles
-                - The market shows a clear preference for {dominant_fuel} over other fuel types
-                """)
-            else:
-                # Handle case where we have more or fewer categories
-                st.info(f"""
-                **Key Observations:**
-                - {dominant_fuel} is the most popular fuel type with {dominant_percentage:.1f}% market share
-                - The market includes {len(counts)} different fuel types
-                - Fuel type distribution shows {'good' if dominant_percentage < 60 else 'strong'} preference for {dominant_fuel}
-                """)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-
-    # Correlation heatmap
-    st.write("### Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(numerical.corr(), annot=True, cmap='coolwarm', ax=ax)
-    st.pyplot(fig)
-    st.write("### 📊 Correlation Insights ")
-    st.info("""
-    -Price is driven up by newer manufacturing year and larger engine size.\n
-    -Price is driven down by higher mileage.\n
-    -Newer cars → lower mileage, explaining the negative link between mileage and year.\n
-    -Engine size doesn’t meaningfully affect mileage or age.\n
-    """)
 
 with prediction:
     st.header("Car Price Prediction")
