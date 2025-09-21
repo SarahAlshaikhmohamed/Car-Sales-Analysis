@@ -35,16 +35,24 @@ This is a data science and machine learning project that analyzes car sales tren
 ### 📂 Project Structure
 ```bash
 Car-Sales-Analysis/
-│── Analytics/                # EDA, Preprocessing, & Dashboard
-    └── Dashboard.py          # Streamlit Dashboard App
-    └── Preprocessing.ipynb   # EDA & Cleaning Notebook
-│── Dataset/                  # Raw & cleaned Datasets
-    └── car_sales_data.csv    # Original Dataset
-    └── cleand.scv            # Procssed Dataset
-│── Model/                    # Model Training, Saved Model, & Interface
-    └── Train.ipynb           # Model Build & Train
-    └── Interface.py          # Fast API App
-    └── Model.pkl             # Trained Model
+│── Analytics/                                        # Preprocessing & Dashboard
+    └── Dashboard.py                                  # Streamlit Dashboard App
+    └── Preprocessing.ipynb                           # EDA & Cleaning Notebook
+    └── car.png                                       # asset
+│── Dataset/                                          # Raw & cleaned Datasets
+    └── car_sales_data.csv                            # Original Dataset
+    └── processed_car_sales_data_cleaning.scv         # Procssed Dataset
+│── Model/                                            # Model Train & Interface
+    │── Models/
+       └── price_model.pkl                            # Trained ML Model
+       └── price_model_statsmodels.pkl                # Trained statmodels Model
+       └── price_prediction_model.keras               # Trained DL Model
+    └── Machine_Learning_Train.ipynb                  # ML Model Train
+    └── Statmodels_Train.ipynb                        # statmodels Model Train
+    └── Deep_Learning_Train.ipynb                     # DL Model Train
+    └── Interface.py                                  # Fast API App
+    └── Model.pkl                                     # Trained Model
+    └── model_metadata                                # Models Metadata
 │── requirements.txt          # Dependencies
 │── README.md                 # Project documentation
 ```
