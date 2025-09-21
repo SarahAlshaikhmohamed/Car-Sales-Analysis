@@ -138,8 +138,8 @@ The FastAPI backend exposes several endpoints:
 - Sarah Alshaikhmohamed.
 
 ---
-### 📽️ Presentation  (Will be updated)
-[Project Presentation]()
+### 📽️ Presentation
+[Project Presentation](https://www.canva.com/design/DAGzhjHhfYQ/oyH98ndXGWj5ZIAcw43jTQ/edit?utm_content=DAGzhjHhfYQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ---
 ### 📜 License
