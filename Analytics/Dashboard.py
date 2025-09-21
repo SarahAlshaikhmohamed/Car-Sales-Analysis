@@ -206,7 +206,7 @@ with descriptive_statistics:
         corr,
         text_auto=True,        # show correlation values on heatmap
         aspect="auto",         # keeps cells square
-        color_continuous_scale="RdBu_r", # red-blue reversed, like coolwarm
+        color_continuous_scale="OrRd", # red-blue reversed, like coolwarm
     )
 
     # Display in Streamlit
