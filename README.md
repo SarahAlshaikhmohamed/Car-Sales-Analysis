@@ -127,15 +127,21 @@ The FastAPI backend exposes several endpoints:
 | POST | `/predict` | Predict car price using Statsmodels, Scikit-learn, and Keras models | json { "engine_size": 2.0, "year": 2018, "mileage": 50000, "manufacturer": "Ford", "model": "Focus", "fuel_type": "Petrol" } | json { "stat_price": 15234.56, "ml_price": 14987.33, "dl_price": 15100.12 }
 
 ---
-### 📈 Results & Insights (Will be updated)
-- Key trends identified in pricing, sales distribution, and fuel type.
-- Regression model trained to predict car sales.
-- Dashboard provides interactive exploration of results.
-- (Screenshots / GIFs of dashboard can be added here later.)
+### 📈 Results & Insights
+-Outlier Detection: Identified extreme values in Price, Mileage, and Year that could represent data entry errors or rare luxury/classic vehicles.
+-Price and mileage are two sides of the same coin and are fundamental for setting competitive market prices.
+-Finding: Price has a strong positive correlation with two key factors:
+                          -Year of Manufacture (+0.7): Newer cars are priced higher, as expected.
+                          -Engine Size (+0.6): Vehicles with larger engines are more expensive.
+-Mileage showed a weaker negative correlation with Price, suggesting that while higher mileage reduces price, the car's age and engine size are more influential determinants of its value.
+
+
 
 ---
 ### 🚀 Recommendations & Future Work (Will be updated)
-- Add more ML models (Random Forest, XGBoost).
+ -Dealers should focus on competitive pricing in popular ranges.
+ -Buyers should consider mileage as a major factor for value.
+- Fine tuning for the ML and state model.
 - Deploy API & dashboard on cloud (Heroku / Render / AWS).
 - Expand dataset with more real-world data.
 
