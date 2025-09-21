@@ -128,24 +128,20 @@ The FastAPI backend exposes several endpoints:
 
 ---
 ### 📈 Results & Insights
--Outlier Detection: Identified extreme values in Price, Mileage, and Year that could represent data entry errors or rare luxury/classic vehicles.
--Price and mileage are two sides of the same coin and are fundamental for setting competitive market prices.
--Finding: Price has a strong positive correlation with two key factors:
-                          -Year of Manufacture (+0.7): Newer cars are priced higher, as expected.
-                          -Engine Size (+0.6): Vehicles with larger engines are more expensive.
--Mileage showed a weaker negative correlation with Price, suggesting that while higher mileage reduces price, the car's age and engine size are more influential determinants of its value.
-
-
+1. Outlier Detection: Identified extreme values in Price, Mileage, and Year that could represent data entry errors or rare luxury/classic vehicles.
+2. Price and mileage are two sides of the same coin and are fundamental for setting competitive market prices.
+3. Finding: Price has a strong positive correlation with two key factors:
+   - Year of Manufacture (+0.7): Newer cars are priced higher, as expected.
+   - Engine Size (+0.6): Vehicles with larger engines are more expensive.
+4. Mileage showed a weaker negative correlation with Price, suggesting that while higher mileage reduces price, the car's age and engine size are more influential determinants of its value.
 
 ---
-### 🚀 Recommendations & Future Work (Will be updated)
- -Dealers should focus on competitive pricing in popular ranges.
- 
- -Buyers should consider mileage as a major factor for value.
- 
-- Fine tuning for the ML and state model.
-- Deploy API & dashboard on cloud (Heroku / Render / AWS).
-- Expand dataset with more real-world data.
+### 🚀 Recommendations & Future Work
+ - Dealers should focus on competitive pricing in popular ranges.
+ - Buyers should consider mileage as a major factor for value.
+ - Fine tuning for the ML and state model.
+ - Deploy API & dashboard on cloud (Heroku / Render / AWS).
+ - Expand dataset with more real-world data.
 
 ---
 ### 👥 Contributors
