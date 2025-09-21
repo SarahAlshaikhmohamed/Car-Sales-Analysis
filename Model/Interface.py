@@ -11,7 +11,8 @@ import os
 
 # Load trained model using googledive
 MODEL_DIR = "Models"
-os.makedirs(MODEL_DIR, exist_ok=True)
+
+os.makedirs("Models", exist_ok=True)
 
 def safe_download(url, output, min_size=50_000):
     if not os.path.exists(output) or os.path.getsize(output) < min_size:
@@ -30,9 +31,9 @@ ml_model_url   = "https://drive.google.com/uc?id=1ugWkLWTWYCid9zupNV6JZvXbeR6i2G
 dl_model_url   = "https://drive.google.com/uc?id=1APHXvn-olqsqnmYQ2i0XFXP2UanR7FJg"
 
 # Paths for saving
-stat_model_path = safe_download(stat_model_url, "Model/price_model_statsmodels.pkl", min_size=50_000)
-ml_model_path   = safe_download(ml_model_url, "Model/price_model.pkl", min_size=50_000)
-dl_model_path   = safe_download(dl_model_url, "Model/price_prediction_model.keras", min_size=50_000)
+stat_model_path = safe_download(stat_model_url, "Models/price_model_statsmodels.pkl", min_size=50_000)
+ml_model_path   = safe_download(ml_model_url, "Models/price_model.pkl", min_size=50_000)
+dl_model_path   = safe_download(dl_model_url, "Models/price_prediction_model.keras", min_size=50_000)
 
 # Load models
 stat_model = joblib.load(stat_model_path)

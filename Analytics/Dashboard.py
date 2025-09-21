@@ -8,6 +8,8 @@ from scipy.stats import zscore
 import io
 import base64
 import os
+import plotly.express as px
+import plotly.graph_objects as go
 import requests
 
 # Set page configuration
@@ -241,7 +243,7 @@ with descriptive_statistics:
             st.plotly_chart(fig, use_container_width=True)
 
             # Insights & Recommendations
-            st.markdown("### 📊 Insights & Recommendations")
+            st.markdown("##### 📊 Insights & Recommendations")
             st.write(f"- {len(outliers)} outliers detected in {selected_col}.")
             if len(outliers) > 0:
                 st.info("- Outliers may distort statistical analyses; consider removing or transforming them for modeling.")
@@ -283,7 +285,7 @@ with descriptive_statistics:
             st.plotly_chart(fig, use_container_width=True)
 
             # Insights & Recommendations
-            st.markdown("### 📊 Insights & Recommendations")
+            st.markdown("##### 📊 Insights & Recommendations")
             st.write(f"- {len(outliers)} outliers detected using Z-Score method in {selected_col}.")
             if len(outliers) > 0:
                 st.info("- Outliers could affect mean-based statistics; consider trimming or transforming values.")
@@ -291,15 +293,13 @@ with descriptive_statistics:
                 st.success("- No extreme outliers found; distribution is acceptable.")
     else:
         st.warning("No data available for outlier analysis after filtering")
-
-
-    with visualization:
+with visualization:
     st.markdown('<p class="sub-header">Data Visualizations</p>', unsafe_allow_html=True)
 
     if len(filtered_data) > 0:
         viz_type = st.selectbox(
             "Select Visualization Type",
-            ["Histograms", "Scatter Plots", "Categorical Analysis", "Price Distribution", "Mileage Analysis"]
+            ["Histograms", "Scatter Plots", "Categorical Analysis"]
         )
 
         # ------------------- Histograms -------------------
@@ -326,8 +326,8 @@ with descriptive_statistics:
                 median_val = filtered_data[selected_col].median()
                 std_val = filtered_data[selected_col].std()
                 skew_val = filtered_data[selected_col].skew()
-                st.markdown("### 📊 Insights & Recommendations")
-                st.write(f"- Mean: {mean_val:.2f}, Median: {median_val:.2f}, Std Dev: {std_val:.2f}")
+                st.markdown("##### 📊 Insights & Recommendations")
+                st.write(f"- Mean: {mean_val:.2f}, Median: {median_val:.2f}, std: {std_val:.2f}")
                 if abs(skew_val) > 0.5:
                     skew_direction = "right-skewed" if skew_val > 0 else "left-skewed"
                     st.info(f"- Distribution is {skew_direction} (skewness: {skew_val:.2f}) → consider transformations for modeling")
@@ -341,7 +341,7 @@ with descriptive_statistics:
                 fig.update_layout(title="Boxplot of Numerical Features", margin=dict(l=40, r=40, t=50, b=40))
                 st.plotly_chart(fig, use_container_width=True)
 
-                st.markdown("### 📊 Insights & Recommendations")
+                st.markdown("##### 📊 Insights & Recommendations")
                 for col in numerical_cols:
                     iqr = filtered_data[col].quantile(0.75) - filtered_data[col].quantile(0.25)
                     st.write(f"- {col}: IQR = {iqr:.2f}")
@@ -367,7 +367,7 @@ with descriptive_statistics:
             fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
             st.plotly_chart(fig, use_container_width=True)
 
-            st.markdown("### 📊 Insights & Recommendations")
+            st.markdown("##### 📊 Insights & Recommendations")
             correlation = filtered_data[x_axis].corr(filtered_data[y_axis])
             correlation_strength = "strong" if abs(correlation) > 0.7 else "moderate" if abs(correlation) > 0.3 else "weak"
             direction = "positive" if correlation > 0 else "negative"
@@ -397,7 +397,7 @@ with descriptive_statistics:
                 fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
                 st.plotly_chart(fig, use_container_width=True)
 
-                st.markdown("### 📊 Insights & Recommendations")
+                st.markdown("##### 📊 Insights & Recommendations")
                 dominant_category = counts.index[0]
                 dominant_percentage = (counts.iloc[0] / counts.sum()) * 100
                 st.write(f"- Most common category: {dominant_category} ({dominant_percentage:.1f}%)")
@@ -417,7 +417,7 @@ with descriptive_statistics:
                 fig.update_layout(margin=dict(l=40, r=40, t=50, b=40))
                 st.plotly_chart(fig, use_container_width=True)
 
-                st.markdown("### 📊 Insights & Recommendations")
+                st.markdown("##### 📊 Insights & Recommendations")
                 highest_price_cat = avg_price.index[0]
                 lowest_price_cat = avg_price.index[-1]
                 price_ratio = avg_price.iloc[0] / avg_price.iloc[-1]
@@ -498,7 +498,7 @@ api_url = st.sidebar.text_input(
     help="Enter the URL of your FastAPI prediction endpoint"
 )
 
-st.markdown('<p class="sub-header">Insights & Recommendations</p>', unsafe_allow_html=True)
+#st.markdown('<p class="sub-header">Insights & Recommendations</p>', unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
