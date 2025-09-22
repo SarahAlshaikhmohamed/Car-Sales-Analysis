@@ -38,19 +38,20 @@ Car-Sales-Analysis/
 │── Analytics/                                        # Preprocessing & Dashboard
     └── Dashboard.py                                  # Streamlit Dashboard App
     └── Preprocessing.ipynb                           # EDA & Cleaning Notebook
-    └── car.png                                       # asset
-│── Dataset/                                          # Raw & cleaned Datasets
+    └── car.png                                       # Asset
+│── Dataset/                                          # Raw & Cleaned Datasets
     └── car_sales_data.csv                            # Original Dataset
     └── processed_car_sales_data_cleaning.scv         # Procssed Dataset
 │── Model/                                            # Model Train & Interface
     └── Machine_Learning_Train.ipynb                  # ML Model Train
-    └── Statmodels_Train.ipynb                        # statmodels Model Train
+    └── Statmodels_Train.ipynb                        # Statmodels Model Train
     └── Deep_Learning_Train.ipynb                     # DL Model Train
     └── Interface.py                                  # Fast API App
     └── Model.pkl                                     # Trained Model
     └── model_metadata                                # Models Metadata
 │── requirements.txt                                  # Dependencies
-│── README.md                                         # Project documentation
+│── Procfile.txt                                      # Deployment Startup Script
+│── README.md                                         # Project Documentation
 ```
 
 ---
