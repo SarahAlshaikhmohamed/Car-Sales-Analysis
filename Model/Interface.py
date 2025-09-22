@@ -64,9 +64,14 @@ class PredictionInput(BaseModel):
 def home():
     return {"message": "Price Prediction API is running!"}
 
+dl_model = None
 
 @app.post("/predict")
 def predict(input_data: PredictionInput):
+    global dl_model
+    if dl_model is None:
+        dl_model = keras.models.load_model(dl_model_path)
+        
     def encode_input(user: PredictionInput) -> pd.DataFrame:
         row = {col: 0 for col in FEATURES}
         row["Engine size"] = user.engine_size
