@@ -475,7 +475,7 @@ with prediction:
         fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "Hybrid"])
 
     if st.button("Predict"):
-        url = "http://127.0.0.1:8000/predict"
+        url = "http://localhost:8000/predict"
         payload = {
             "engine_size": float(engine_size),
             "year": int(year),
