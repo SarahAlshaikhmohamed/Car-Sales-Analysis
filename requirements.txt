@@ -8,5 +8,5 @@ seaborn
 uvicorn
 statsmodels
 scikit-learn==1.6.1
-tensorflow
+tensorflow-cpu
 gdown
