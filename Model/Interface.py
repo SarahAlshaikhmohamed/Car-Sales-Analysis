@@ -70,6 +70,7 @@ dl_model = None
 def predict(input_data: PredictionInput):
     global dl_model
     if dl_model is None:
+        from tensorflow import keras
         dl_model = keras.models.load_model(dl_model_path)
         
     def encode_input(user: PredictionInput) -> pd.DataFrame:
