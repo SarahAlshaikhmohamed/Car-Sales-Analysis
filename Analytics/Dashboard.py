@@ -489,13 +489,11 @@ with prediction:
             response = requests.post(url, json=payload, timeout=5)
             response.raise_for_status()
             result = response.json()
-            stat, ml, dl, = st.columns(3)
+            stat, ml, dl, = st.columns(2)
             with stat:
                 st.success(f"Price (statsmodels): ${abs(result.get('stat_price')):,.2f}")
             with ml:
-                st.success(f"Price (ML): ${result.get('ml_price'):,.2f}")
-            with dl:
-                st.success(f"Price (DL): ${result.get('dl_price'):,.2f}")
+                st.success(f"Price (Randomforest): ${result.get('ml_price'):,.2f}")
         except Exception as e:
             st.error(f"Error connecting to prediction API: {e}")
             st.info("Make sure your FastAPI server is running on http://127.0.0.1:8000")
