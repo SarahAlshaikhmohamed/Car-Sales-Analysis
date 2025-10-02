@@ -1,6 +1,6 @@
 from sklearn.preprocessing import OneHotEncoder
 
-encoder = OneHotEncoder(drop="first", sparse=False)
+encoder = OneHotEncoder(drop="first")
 
 # encoding function
 def encode(data):
