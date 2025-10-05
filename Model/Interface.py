@@ -6,7 +6,7 @@ import numpy as np
 import statsmodels.api as sm
 import pickle
 import os
-from Encoder import encode, decode
+from Model.Encoder import encode, decode
 
 
 # Load models
