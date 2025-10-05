@@ -489,7 +489,7 @@ with prediction:
             response = requests.post(url, json=payload, timeout=5)
             response.raise_for_status()
             result = response.json()
-            stat, ml, dl, = st.columns(2)
+            stat, ml = st.columns(2)
             with stat:
                 st.success(f"Price (statsmodels): ${abs(result.get('stat_price')):,.2f}")
             with ml:
