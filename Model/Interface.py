@@ -6,18 +6,16 @@ import numpy as np
 import statsmodels.api as sm
 import pickle
 import os
-from Encoder import encode, decode
+from Model.Encoder import encode, decode
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STM_PATH = os.path.join(BASE_DIR, "../STM")
-RF_PATH = os.path.join(BASE_DIR, "../RF")
 
-# Load models
-stat_model = joblib.load(os.path.join(STM_PATH, "st_model.joblib"))
-stat_scaler = joblib.load(os.path.join(STM_PATH, "scaler.pkl"))
-ml_model = joblib.load(os.path.join(RF_PATH, "rf_model.joblib"))
-ml_scaler = joblib.load(os.path.join(RF_PATH, "scaler.pkl"))
+stat_model = joblib.load(os.path.join(BASE_DIR, "STM/st_model.joblib"))
+stat_scaler = joblib.load(os.path.join(BASE_DIR, "STM/scaler.pkl"))
+ml_model = joblib.load(os.path.join(BASE_DIR, "RF/rf_model.joblib"))
+ml_scaler = joblib.load(os.path.join(BASE_DIR, "RF/scaler.pkl"))
+
 
 app = FastAPI()
 
