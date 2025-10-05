@@ -11,9 +11,9 @@ from Encoder import encode, decode
 
 # Load models
 stat_model = joblib.load("./STM/st_model.joblib")
-stat_scaler = pickle.load("./STM/scaler.pkl")
-ml_model   = joblib.load("./RF/rf_model.joblib")
-ml_scaler = pickle.load("./RF/scaler.pkl")
+stat_scaler = joblib.load("./STM/scaler.pkl")
+ml_model = joblib.load("./RF/rf_model.joblib")
+ml_scaler = joblib.load("./RF/scaler.pkl") 
 
 app = FastAPI()
 
@@ -34,16 +34,29 @@ dl_model = None
 
 @app.post("/predict")
 def predict(input_data: PredictionInput):
-        
-    data = encode(input_data)
+
+    input_dict = input_data.dict()
+    data = encode(input_dict)
+
+    expected_features = 23
+    current_features = data.shape[1]
+
+    if current_features < expected_features:
+        # pad with zeros (difference at the end)
+        pad_width = expected_features - current_features
+        data = np.hstack([data, np.zeros((data.shape[0], pad_width))])
+    elif current_features > expected_features:
+        # truncate extra features just in case
+        data = data[:, :expected_features]
 
     # --- Statsmodels ---
-    data = stat_scaler.transform(data)
-    data_sm = sm.add_constant(data, has_constant="add")
+    data_sm = stat_scaler.transform(data)
+    data_sm = sm.add_constant(data_sm, has_constant="add")
     stat_model_pred = stat_model.predict(data_sm)[0]
 
     # --- Scikit-learn ---
-    ml_model_pred = ml_model.predict(data)[0]
+    data_ml = ml_scaler.transform(data)
+    ml_model_pred = ml_model.predict(data_ml)[0]
 
     return {
         "stat_price": float(stat_model_pred),
