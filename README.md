@@ -6,7 +6,7 @@ This is a data science and machine learning project that analyzes car sales tren
 ### 🎯 Objectives
 - Analyze car sales data to uncover trends and patterns.
 - Identify key factors influencing car prices.
-- Build and compare multiple regression models (Statsmodels, Scikit-learn, Keras).
+- Build and compare regression models (Statsmodels & Scikit-learn).
 - Deploy a FastAPI backend with endpoints for real-time car price prediction.
 - Create an interactive dashboard (Streamlit + Plotly) for data visualization and user input.
 
@@ -16,42 +16,74 @@ This is a data science and machine learning project that analyzes car sales tren
 - 🤖 Predictive Modeling:
       - Statsmodels regression.
       - Scikit-learn regression model.
-      - Deep Learning (Keras Sequential model).
 - ⚡ FastAPI Backend: REST API for car price predictions (/predict).
 - 📈 Interactive Dashboard: Built with Streamlit + Plotly for user-friendly visualizations.
-- ☁️ Model Hosting: Large model files stored in Google Drive, automatically downloaded at runtime.
+- ☁️ Models are preloaded locally in Docker for fast inference.
 
 ---
 ### 🛠 Tech Stack
 - Python: NumPy, Pandas, Matplotlib, Seaborn.
 - Visualization: Streamlit, Plotly.
 - Machine Learning: Scikit-learn, Statsmodels.
-- Deep Learning: TensorFlow / Keras.
 - Backend: FastAPI (for API endpoints).
-- Model Hosting: Google Drive + gdown for large model files.
 - Version Control: Git + GitHub.
+
+---
+### 🐳 Docker Setup
+This project is containerized for reproducibility and easy deployment.
+
+```bash
+# Build the image
+docker build -t car-sales-analysis .
+
+# Run container
+docker run -p 8000:8000 -p 7860:7860 car-sales-analysis
+```
 
 ---
 ### 📂 Project Structure
 ```bash
 Car-Sales-Analysis/
-│── Analytics/                                        # Preprocessing & Dashboard
-    └── Dashboard.py                                  # Streamlit Dashboard App
-    └── Preprocessing.ipynb                           # EDA & Cleaning Notebook
-    └── car.png                                       # Asset
-│── Dataset/                                          # Raw & Cleaned Datasets
-    └── car_sales_data.csv                            # Original Dataset
-    └── processed_car_sales_data_cleaning.scv         # Procssed Dataset
-│── Model/                                            # Model Train & Interface
-    └── Machine_Learning_Train.ipynb                  # ML Model Train
-    └── Statmodels_Train.ipynb                        # Statmodels Model Train
-    └── Deep_Learning_Train.ipynb                     # DL Model Train
-    └── Interface.py                                  # Fast API App
-    └── Model.pkl                                     # Trained Model
-    └── model_metadata                                # Models Metadata
-│── requirements.txt                                  # Dependencies
-│── Procfile.txt                                      # Deployment Startup Script
-│── README.md                                         # Project Documentation
+│
+├── .streamlit/                            # Streamlit configuration
+│   └── config.toml
+│
+├── Analytics/                             # Streamlit dashboard and preprocessing
+│   ├── .gitattributes
+│   ├── Dashboard.py                       # Main Streamlit dashboard (frontend UI)
+│   ├── Preprocessing.ipynb                # Data preprocessing notebook
+│   └── car.png                            # Dashboard image
+│
+├── Dataset/                               # Raw and cleaned datasets
+│   ├── car_sales_data.csv
+│   └── processed_car_sales_data_cleaning.csv
+│
+├── app/                                   # FastAPI backend and ML models
+│   ├── RF/                                # Random Forest model files
+│   │   ├── model_metadata.json
+│   │   ├── rf_model.joblib
+│   │   └── scaler.pkl
+│   │
+│   ├── STM/                               # Statsmodels regression model files
+│   │   ├── model_metadata.json
+│   │   ├── st_model.joblib
+│   │   └── scaler.pkl
+│   │
+│   ├── __pycache__/                       # Compiled Python cache
+│   │   ├── Encoder.cpython-310.pyc
+│   │   └── Interface.cpython-310.pyc
+│   │
+│   ├── Encoder.py                         # Encoding and feature transformation logic
+│   ├── Machine_Learning_Train.ipynb       # Random Forest model training notebook
+│   ├── Statmodels_Train.ipynb             # Statsmodels training notebook
+│   ├── __init__.py
+│   └── app.py                             # FastAPI entry point (backend API)
+│
+├── .gitattributes
+├── Dockerfile                             # Docker container definition (runs Streamlit + FastAPI)
+├── README.md                              # Project documentation
+├── app.sh                                 # Shell script to launch both services
+├── requirements.txt                       # Python dependencies
 ```
 
 ---
@@ -99,21 +131,17 @@ This dataset is useful for analyzing trends in the automotive industry, such as 
 
 ---
 ### ▶️ Usage
-- Run EDA & Preprocessing
-  ```bash
-  python eda/eda_script.py
-  ```
-- Run Streamlit dashboard
-  ```bash
-  python -m streamlit run Dashboard.py
-  ```
-- Run FastAPI Server
-  ```bash
-  python -m uvicorn Interface:app --reload
-  ```
-- View Dashboard
-  
-  [Car Sales Dashboard](http://192.168.0.60:8501)
+Start both the FastAPI backend (port 8000) and Streamlit dashboard (port 7860):
+```bash
+bash app.sh
+```
+
+Then open:
+
+🌐 Dashboard: [http://localhost:7860](http://localhost:7860)
+
+⚙️ API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
   
 ---
 ### 🌐 API Endpoints
@@ -121,7 +149,16 @@ The FastAPI backend exposes several endpoints:
 | Method | Endpoint | Description | Request Body (JSON) | Response (JSON) |
 |--------|----------|-------------|----------------------|-----------------|
 | GET | `/` | Verify that the API is running | None | { "message": "Price Prediction API is running!" }
-| POST | `/predict` | Predict car price using Statsmodels, Scikit-learn, and Keras models | json { "engine_size": 2.0, "year": 2018, "mileage": 50000, "manufacturer": "Ford", "model": "Focus", "fuel_type": "Petrol" } | json { "stat_price": 15234.56, "ml_price": 14987.33, "dl_price": 15100.12 }
+| POST | `/predict` | Predict car price using Statsmodels and Scikit-learn models | json { "engine_size": 2.0, "year": 2018, "mileage": 50000, "manufacturer": "Ford", "model": "Focus", "fuel_type": "Petrol" } | json { "stat_price": 15234.56, "ml_price": 14987.33 }
+
+---
+### 🚀 Deployment
+This project is fully deployed on **Hugging Face Spaces** using a Docker container that runs both:
+- 🧠 FastAPI backend on port `8000`
+- 💻 Streamlit dashboard on port `7860`
+
+Visit the live app here:  
+[Car Sales Dashboard](https://huggingface.co/spaces/SAliiv52/Car-Sales-Analysis)
 
 ---
 ### 📈 Results & Insights
@@ -136,7 +173,7 @@ The FastAPI backend exposes several endpoints:
 ### 🚀 Recommendations & Future Work
  - Dealers should focus on competitive pricing in popular ranges.
  - Buyers should consider mileage as a major factor for value.
- - Fine tuning for the ML and state model.
+ - Fine-tuning for the Statsmodels regression model.
  - Deploy API & dashboard on cloud (Heroku / Render / AWS).
  - Expand dataset with more real-world data.
 
