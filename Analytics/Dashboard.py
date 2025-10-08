@@ -1,4 +1,19 @@
 # Dashboard.py
+import os
+
+os.environ["HOME"] = "/tmp"
+os.environ["STREAMLIT_CONFIG_DIR"] = "/tmp/.streamlit"
+os.environ["STREAMLIT_CACHE_DIR"] = "/tmp/.streamlit/cache"
+os.environ["MPLCONFIGDIR"] = "/tmp/matplotlib"
+os.environ["XDG_CACHE_HOME"] = "/tmp/.cache"
+os.environ["STREAMLIT_BROWSER_GATHERUSAGESTATS"] = "false"
+os.environ["STREAMLIT_DISABLE_METRICS"] = "true"
+
+os.makedirs("/tmp/.streamlit", exist_ok=True)
+os.makedirs("/tmp/.streamlit/cache", exist_ok=True)
+os.makedirs("/tmp/matplotlib", exist_ok=True)
+os.makedirs("/tmp/.cache", exist_ok=True)
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,7 +22,6 @@ import seaborn as sns
 from scipy.stats import zscore
 import io
 import base64
-import os
 import plotly.express as px
 import plotly.graph_objects as go
 import requests
@@ -36,12 +50,17 @@ st.markdown("""
 # Title and description
 st.markdown('<h1 class="main-header">🚗 Car Sales Dashboard</h1>', unsafe_allow_html=True)
 
+# Paths
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(ROOT_DIR, "Dataset", "processed_car_sales_data_cleaning.csv")
+IMAGE_PATH = os.path.join(ROOT_DIR, "Analytics", "car.png")
+
 # Function to load data
 @st.cache_data
 def load_data():
     try:
         # Load your dataset .read_csv("../Dataset/winners_f1_cleaned.csv")
-        df = pd.read_csv("../Dataset/processed_car_sales_data_cleaning.csv")
+        df = pd.read_csv(DATA_PATH)
         
         return df
     except:
@@ -53,7 +72,7 @@ data = load_data()
 
 # Sidebar for dataset describtion and filters and information
 with st.sidebar:
-    st.image("car.png", width=250)
+    st.image(IMAGE_PATH, width=250)
     with st.sidebar:
         filters_tab, about_tab = st.tabs(["Filters", "About",])
 
@@ -115,20 +134,17 @@ with st.sidebar:
         <p>This dashboard analyzes a comprehensive car sales dataset containing information about various vehicles 
         including their specifications, pricing, and sales information. The dataset includes both numerical and 
         categorical attributes that help in understanding the car market trends.</p>
-
         ### Analytics Objectives
         - **Pricing Trends:** How prices vary by brand, model, year, and features.  
         - **Market Preferences:** Popular car categories, fuel types, and engine sizes.  
         - **Sales Performance:** Top-performing manufacturers and models.  
         - **Feature Correlations:** Attribute relationships and their impact on price.  
         - **Outlier Detection:** Spotting unusual patterns or anomalies.  
-
         ### Key Metrics
         - Average prices by manufacturer and fuel type.  
         - Car distribution by year of manufacture.  
         - Mileage trends and their effect on price.  
         - Engine size preferences across segments.
-
         ### Data Source 
         Kaggle - [Car Sales Data](https://www.kaggle.com/datasets/minahilfatima12328/car-sales-info/data")
                 </div>
@@ -475,7 +491,7 @@ with prediction:
         fuel_type = st.selectbox("Fuel Type", ["Petrol", "Diesel", "Hybrid"])
 
     if st.button("Predict"):
-        url = "http://localhost:8000/predict"
+        API_URL = "http://127.0.0.1:8000/predict"
         payload = {
             "engine_size": float(engine_size),
             "year": int(year),
@@ -486,7 +502,7 @@ with prediction:
         }
         try:
             # send JSON body (POST)
-            response = requests.post(url, json=payload, timeout=5)
+            response = requests.post(API_URL, json=payload, timeout=5)
             response.raise_for_status()
             result = response.json()
             stat, ml = st.columns(2)
